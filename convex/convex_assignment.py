@@ -58,7 +58,7 @@ constraints = [
 
 # Problem
 problem = cp.Problem(objective, constraints)
-problem.solve(solver=cp.SCS, verbose=True)
+problem.solve(solver=cp.ECOS, verbose=True)
 
 # Results
 p_max = problem.value
