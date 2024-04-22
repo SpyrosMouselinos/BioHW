@@ -32,25 +32,28 @@ p1 /= np.sum(p1)
 p2 = np.exp(-(r - mu2) ** 2 / (2 * sigma2 ** 2))
 p2 /= np.sum(p2)
 
+plt.rcParams['figure.figsize'] = [6, 3]
+fig = plt.figure()
+plt.plot(r, p1, 'g', linewidth=1)
+plt.plot(r, p2, 'r', linewidth=1)
+plt.show()
+
 # Create the joint probability matrix P
 P = cp.Variable((n, n), nonneg=True)
-
 # Objective: Maximize probability of R1 + R2 <= 0
 r1p = r[:, np.newaxis]
 r2p = r[np.newaxis, :]
-loss_mask = (r1p + r2p <= 0) * 1.0
-objective = cp.Maximize(cp.sum(cp.multiply(P, loss_mask)))
+loss_mask = (r1p + r2p <= 0)
+objective = cp.Maximize(cp.sum(P[loss_mask]))
 
 diff_r1 = r - mu1
 diff_r2 = r - mu2
 
 # Constraints
 constraints = [
-    P >= 0,
-    P <= 1,
-    cp.sum(P, axis=0) == p1,
-    cp.sum(P, axis=1) == p2,
-    diff_r1.T @ P @ diff_r2 == rho * sigma1 * sigma2
+    cp.sum(P, axis=0) == p2,
+    cp.sum(P, axis=1) == p1,
+    cp.matmul((cp.matmul(diff_r1.T, P)), diff_r2) == rho * sigma1 * sigma2
 ]
 
 # Problem
@@ -71,5 +74,5 @@ p_table[p_table < 5e-3] = 0
 X, Y = np.meshgrid(r, r)
 plt.axes().set_aspect('equal')
 plt.contour(X, Y, p_table)
-plt.plot(r, list(map(lambda x: max(x, -20), -r)), color="r")  # R1+R2==0 red line
+plt.plot(r, list(map(lambda x: max(x, -20), -r)), color="r", linewidth=0.3)  # R1+R2==0 red line
 plt.show()

@@ -174,4 +174,4 @@ Phylo.draw(njtree, branch_labels=lambda c: round(c.branch_length, 2))
 
 # And finally save them
 Phylo.write(upgmatree, "../data/upgmatree.nxs", "nexus")
-Phylo.write(upgmatree, "../data/upgmatree.nxs", "nexus")
+Phylo.write(njtree, "../data/njtree.nxs", "nexus")
