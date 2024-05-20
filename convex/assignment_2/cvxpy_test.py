@@ -1,37 +1,28 @@
-# Import packages.
 import cvxpy as cp
 import numpy as np
 
-import cvxpy as cp
-import numpy as np
+# Define the size of the matrix
+n = 3
 
-# Define the dimensions of the matrix
-n_rows, n_cols = 3, 4
+# Example PSD matrix P
+P = np.array([[4, 1, 1],
+              [1, 2, 1],
+              [1, 1, 3]])
 
-# Create a variable matrix of size n_rows x n_cols
-matrix = cp.Variable((n_rows, n_cols))
+# Define the variable X
+X = cp.Variable((n, n), symmetric=True)
 
-# Known boolean mask (as a 2D array)
-mask = np.array([
-    [1, 0, 0, 1],
-    [0, 1, 1, 0],
-    [1, 0, 0, 1]
-], dtype=bool)
+# Define the constraints
+constraints = [X >> 0, cp.bmat([[X, P], [P, X]]) >> 0]
 
-# Objective function: minimize the sum of the masked elements
-objective = cp.Minimize(cp.sum(cp.multiply(mask, matrix)))
-
-# Constraints
-constraints = [
-    matrix >= 0,  # All elements must be non-negative
-    cp.sum(matrix, axis=1) == [10, 15, 12]  # Sum of rows must match these values
-]
-
-# Define and solve the problem
+# Define the problem
+# Since we are only interested in finding X, we can minimize a constant (e.g., 0)
+objective = cp.Minimize(0)
 problem = cp.Problem(objective, constraints)
-problem.solve(solver=cp.GUROBI)
 
-# Output the results
-print("The optimal matrix is:")
-print(matrix.value)
-print("Minimum sum of selected elements:", problem.value)
+# Solve the problem
+problem.solve()
+
+# Print the result
+print("Square root of P (X):")
+print(X.value)
