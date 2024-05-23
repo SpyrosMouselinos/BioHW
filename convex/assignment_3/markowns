@@ -1,0 +1,30 @@
+## Solution
+--------
+
+### Theoretical Part
+
+##### 1) Show that the objective function $f$ is convex - Note: The exersize says $f(S)$ but since our variable is P, I think it makes sense to refer to it as $f(P)$ instead
+
+To show that the objective function $\( f(P) \)$ is convex, we first expand the expression for $\( d(x_i, y_i) \)$:
+$d(x_i, y_i) = (x_i - y_i)^T P (x_i - y_i) ^{1/2}.$
+
+Substitute this into the objective function $\( f(P) \)$:
+$f(P) = \frac{1}{N} \sum_{i=1}^N ( d_i - \left( (x_i - y_i)^T P (x_i - y_i) \right)^{1/2})^2.$
+
+Let $\( z_i = x_i - y_i \)$. Then, the objective function becomes:
+$f(P) = \frac{1}{N} \sum_{i=1}^N (d_i - \left( z_i^T P z_i \right)^{1/2})^2.$
+
+To prove convexity, we need to show that $\( f(P) \)$ is a convex function of $\( P \)$. By expanding the square we end up:
+$f(P) = \frac{1}{N} \sum_{i=1}^N ( d_i^2 - 2 d_i (z_i^T P z_i)^{1/2} + z_i^T P z_i).$
+
+We can ignore the $\frac{1}{N}$ for our analysis, end we end up with a sum of terms that look like:
+
+$d_i^2 - 2 d_i (z_i^T P z_i)^{1/2} + z_i^T P z_i$
+
+For each term:
+- $\( d_i^2 \)$ is constant with respect to \( P \).
+- $\( z_i^T P z_i \)$ is linear in $\( P \)$ because $\( P \in \mathbf{S}^n_+ \)$, and the product $\( z_i^T P z_i \)$ is a linear function of $\( P \)$.
+- The square root of the affine function $z_i^T P z_i$ is concave and multiplying by a negative constant $-2 d_i$ makes it convex. $-2 d_i (z_i^T P z_i)^{1/2}$ is convex.
+
+Therefore, each term of the summation is a sum of a constant, a linear term, and a convex term, thus a convex term. The sum of convex terms is convex, which makes $\( f(P) \)$ a convex function.
+
