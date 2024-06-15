@@ -22,9 +22,11 @@ from Bio import SeqIO
 
 
 def inspect_fasta_file(fasta_file, num_sequences=3):
+
     """
     Inspect the content of a FASTA file.
     """
+
     sequences = list(SeqIO.parse(fasta_file, "fasta"))
     print(f"File: {fasta_file}")
     print(f"Total sequences: {len(sequences)}\n")

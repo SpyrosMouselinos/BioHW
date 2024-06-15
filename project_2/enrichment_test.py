@@ -9,10 +9,13 @@ import scipy.stats as stats
 from Bio import SeqIO
 
 
+
 def fisher_test(matrix, groupA, groupB):
+
     """
     Perform Fisher's Test for each column in the matrix.
     """
+
     p_values = []
     for column in matrix.columns:
         # Create the contingency table

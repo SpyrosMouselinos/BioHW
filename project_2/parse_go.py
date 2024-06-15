@@ -16,6 +16,7 @@ output_csv = DATA_FILE_LOCATION + "go_annotations.csv"
 
 
 def fix_gaf_file(file):
+
     flag = False
     with open(file, 'r') as fin:
         inline = fin.readline()

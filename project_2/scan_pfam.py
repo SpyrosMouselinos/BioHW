@@ -24,6 +24,7 @@ HMMSCAN_RESULTS_URL = "https://www.ebi.ac.uk/Tools/hmmer/results"
 HMMDB_NAME = "pfam"
 
 
+
 def submit_hmmscan(seq):
     """
     Submit a sequence to the hmmscan service and return the job ID.
