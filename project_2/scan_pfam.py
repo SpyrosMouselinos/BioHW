@@ -14,6 +14,7 @@ import requests
 import time
 import pandas as pd
 from Bio import SeqIO
+from tqdm import tqdm
 
 DATA_FILE_LOCATION = "../data/"
 input_fasta = DATA_FILE_LOCATION + "output_translated_proteins.fa"
@@ -38,7 +39,7 @@ def submit_hmmscan(seq):
                              headers=headers,
                              data={'hmmdb': HMMDB_NAME, 'seq': seq})
     response.raise_for_status()
-    time.sleep(2)
+    time.sleep(0.5)
     return response.url.split('/')[-2]
 
 
@@ -58,7 +59,8 @@ def parse_results(json_result):
     """
     domains = []
     for hit in json_result['results']['hits']:
-        domains.append(hit['acc'])
+        for domain in hit['domains']:
+            domains.append(domain['alihmmname'])
     return domains
 
 

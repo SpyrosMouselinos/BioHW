@@ -16,7 +16,6 @@ output_csv = DATA_FILE_LOCATION + "go_annotations.csv"
 
 
 def fix_gaf_file(file):
-
     flag = False
     with open(file, 'r') as fin:
         inline = fin.readline()
@@ -35,21 +34,34 @@ def fix_gaf_file(file):
     return file
 
 
-def parse_gaf(file):
+def parse_gaf(file, limit_to_available_genes=None):
     """
     Parse the GAF file to extract gene and GO term associations.
     Note: I met a problem reading the file because there was no GAF version in the first line so I add it manually.
-    From what I saw online our file fits the 2.0 version not the 1.0 version
+    From what I saw online our file fits the 2.0 version not the 1.0 version.
+    Also, I found that the p-values later change a bit if limit the available GO's to those that actually match our
+    available list of genes. So I leave the option to gather all GO's ~~limit_to_available_genes=None~~ or limit it
+    to the available genes (the difference is small tbh).
     """
     gene_go_mapping = {}
+    if limit_to_available_genes is None:
+        limit_to_available_genes = []
 
     with open(file, 'r') as handle:
         for rec in gafiterator(handle):
             gene_id = rec['DB_Object_Symbol']
             go_id = rec['GO_ID']
-            if gene_id not in gene_go_mapping:
-                gene_go_mapping[gene_id] = set()
-            gene_go_mapping[gene_id].add(go_id)
+
+            if len(limit_to_available_genes) > 0 and gene_id in limit_to_available_genes:
+                if gene_id not in gene_go_mapping:
+                    gene_go_mapping[gene_id] = set()
+                gene_go_mapping[gene_id].add(go_id)
+            elif len(limit_to_available_genes) > 0 and not(gene_id in limit_to_available_genes):
+                pass
+            elif len(limit_to_available_genes) == 0:
+                if gene_id not in gene_go_mapping:
+                    gene_go_mapping[gene_id] = set()
+                gene_go_mapping[gene_id].add(go_id)
 
     return gene_go_mapping
 
@@ -60,10 +72,8 @@ def get_gene_ids_from_fasta(fasta_file):
     """
     gene_ids = []
     for record in SeqIO.parse(fasta_file, "fasta"):
-        description_parts = record.description.split(" ")
-        gene_id = description_parts[-1]  # Assuming the gene ID is the last part (That's what I did in extend.py)
-        gene_ids.append(gene_id)
-    return gene_ids
+        gene_ids.append(record.id)
+    return set(gene_ids)
 
 
 def create_go_matrix(genes, gene_go_mapping):
@@ -85,7 +95,7 @@ def create_go_matrix(genes, gene_go_mapping):
 
 def main():
     genes = get_gene_ids_from_fasta(translated_proteins_file)
-    gene_go_mapping = parse_gaf(fix_gaf_file(gaf_file))
+    gene_go_mapping = parse_gaf(fix_gaf_file(gaf_file), limit_to_available_genes=genes)
     go_matrix = create_go_matrix(genes, gene_go_mapping)
     go_matrix.to_csv(output_csv)
     print(f"GO annotations have been written to {output_csv}")
